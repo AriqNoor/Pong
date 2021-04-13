@@ -1,0 +1,128 @@
+#The import of tkinter as tk is what allows me to create all the graphics for my game
+import tkinter as tk
+
+root = tk.Tk()
+#This 'root.title' method displays the title of the game "Pong" on the top of the canvas
+root.title("Pong")
+
+#Here, I set the width and height of the canvas to determine how big the boundaries are for my game
+WIDTH, HEIGHT = 500, 400
+#Canvas is a rectangular area that allows me to draw anything within a window of a particular width and height
+canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT)
+#canvas.pack is a method that organizes the widgets in blocks before placing them in the parent widget
+#The widgets in my game refer to the red bar, black circle, and blue rectangles
+#The parent widget is the root method that calls tk
+canvas.pack()
+#Here, I used the canvas.create_text method to show text "Lives remaining:"
+canvas.create_text(250, 25, font=("Arial", 32), text="Lives remaining:")
+
+#Here, I set the variables xspeed and yspeed which determine the speeds of my circle
+#The circle always moves diagonally, this is because I set the xspeed = yspeed so that the circle will move diagonally
+xspeed = 6
+yspeed = 6
+#The x and y coordinates state the beginning position of my red bar
+x, y = 10, 10
+#This is the variable that determines the size and beginning coordinates of the black circle
+ball = canvas.create_oval(150, 150, 150+10, 150+10, fill='black')
+#This is the variable that determines the size and beginning coordinates of the red bar
+left_bar = canvas.create_rectangle(10, 10, 20, 80, fill='red')
+#Here, I set a variable "num" which determines the amount of lives remaining. I set the game so that I have 3 lives to spare
+num = 3
+lives = canvas.create_text(390, 25, font=("Arial", 32), text=str(num))
+
+#This for loop in a range is what I used to create the blue rectangles
+for i in range(6):
+    #These variables determine the x and y coordinates of the blue rectangles
+    #There are 2 x variables because I need to make to columns of rectangles
+   x1 = 300
+   x2 = 330
+   y1 = 325
+    #I created this tag for a later function that states the rectangle will disappear if the tag matches with the ball
+   canvas.create_rectangle((x1-15,y1-25-i*50,x1+15,y1+25-i*50), fill="blue", tags=("hit"))
+   canvas.create_rectangle((x2-15,y1-25-i*50,x2+15,y1+25-i*50), fill="blue", tags=("hit"))
+
+#This function, keypress is what allows me to control which the red bar moves, whether it be up or down
+def keypress(event):
+   x, y = 0, 0
+   #The if condition states that if I press the "up" key on my keyboard, the red bar will move closer to the top of the canvas
+   if event.keysym == "Up":
+       y = -30
+   # The elif condition states that if I press the "down" key on my keyboard, the red bar will move closer to the bottom of the canvas
+   elif event.keysym == "Down":
+       y = 30
+   canvas.move(left_bar, x, y)
+
+#This function, printkey is useless for my game but it was what caused me to discover the keywords for the up and down arrows on my keyboard.
+def printkey(event):
+   print('press:' + event.keysym)
+
+#This function, moveBall is what allows the ball to be moved
+def moveBall():
+#The global keyword allows me to modify the variable outside its current scope
+#In other words, I can use the same variables outside the function and within the function, as you see with xspeed, yspeed, and num
+   global xspeed, yspeed, num
+
+    #canvas.move is a method that moves the black circle at speeds of xspeed and yspeed
+   canvas.move(ball, xspeed, yspeed)
+    #The canvas.coords method allows me to identify the coordinates of the black circle on the canvas
+   (leftPos, topPos, rightPos, bottomPos) = canvas.coords(ball)
+    #Here, I create the variable, box to see if the black circle makes contact with the blue rectangles
+   box = canvas.find_closest(leftPos,topPos)
+   #print(canvas.gettags(box))
+
+    #canvas.gettags is a method that identifies a certain object in the canvas
+    #This if statement deletes a blue rectangle if the tag identifies the black circle making contact with the blue rectangle
+    #The if statement also causes the black circle to bounce off the blue rectangle to the opposite direction
+   if canvas.gettags(box) == ('hit',):
+       xspeed = -xspeed
+       canvas.delete(box)
+    #The find method determines if there are any tags remaining
+    #This if not statement calls the function, wintext, if there are no blue rectangles remaining
+   if not canvas.find_withtag(('hit',)):
+       winText()
+
+    #This canvas.coords method allows me to determine the coordinates of the red bar
+   (l, t, r, b) = canvas.coords(left_bar)
+    #This if statement reduces the amount of lives left by 1 because the black circle has passed the red bar
+   if leftPos <= 0:
+       xspeed = -xspeed
+       num -= 1
+       canvas.itemconfigure(lives, text=num)
+       #This if statement calls the function, stopText(), if you run out of lives
+       if num == 0:
+           stopText()
+    #This if statement causes the black circle to bounce back at a speed of -xspeed because it has made contact with the red bar
+   if leftPos <= r and topPos >= t and bottomPos <= b:
+       xspeed = -xspeed
+    #This if statement causes the black circle to bounce back at a speed of -yspeed because it has made contact with the top or bottom boundaries of the canvas
+   if topPos <= 0 or bottomPos >= HEIGHT:
+       yspeed = -yspeed
+    # This if statement causes the black circle to bounce back at a speed of -xspeed because it has made contact with the red bar
+   if rightPos >= WIDTH and bottomPos >= HEIGHT:
+       xspeed = -xspeed
+    # This if statement causes the black circle to bounce back at a speed of -xspeed because it has made contact with the red bar
+   if rightPos >= WIDTH:
+       xspeed = -xspeed
+    #canvas.after is a method that calls the function, moveBall, the 30 within the method shows the delay in movement of the black circle
+    #For instance, if I reduce the 30 to a smaller number, the black circle will move faster
+   canvas.after(30, moveBall)
+
+#This function prints out the designed if you lose the game
+def stopText():
+    #canvas.delete is a method that deletes certain widgets off of canvas
+    #The "all" tag erases everything you've created on the canvas
+   canvas.delete("all")
+   canvas.create_text(250, 200, font=("Arial", 50), text="Game Over")
+
+#This function prints out the designed text if you win the game
+def winText():
+   canvas.delete("all")
+   canvas.create_text(250, 200, font = ("Arial", 30), text="Congratulations! You won!")
+
+#This root method calls the function, keypress and allows me to press the keys to control the red bar
+root.bind("<Key>", keypress)
+#root.bind("<Key>", printkey)
+#I need to call the canvas.after method so that it will run in the mainloop
+canvas.after(30, moveBall)
+#The mainloop is the method that runs the code over and over again and it won't stop until I have told it to stop
+root.mainloop()
