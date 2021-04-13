@@ -4,6 +4,9 @@ import tkinter as tk
 #When I mention the use of a 'method' I refer to a function that belongs to an object.
 #For example, canvas.move() is a function where the 'move' method belongs to the 'object' canvas
 #When I say function in python, that refers to a block of code that performs an assigned task that can be reused by the use of a function call
+#You will see me refer to functions and function calls later on
+#The variable, root, calls the import, tk so that I can effectively use the import in my program
+#This root variable has various uses such as displaying the title as well as running the code through a mainloop
 root = tk.Tk()
 #This 'root.title' method displays the title of the game "Pong" on the top of the canvas
 root.title("Pong")
@@ -71,7 +74,6 @@ def moveBall():
    (leftPos, topPos, rightPos, bottomPos) = canvas.coords(ball)
     #Here, I create the variable, box to see if the black circle makes contact with the blue rectangles
    box = canvas.find_closest(leftPos,topPos)
-   #print(canvas.gettags(box))
 
     #canvas.gettags is a method that identifies a certain object in the canvas
     #This if statement deletes a blue rectangle if the tag identifies the black circle making contact with the blue rectangle
@@ -124,8 +126,11 @@ def winText():
 
 #This root method calls the function, keypress and allows me to press the keys to control the red bar
 root.bind("<Key>", keypress)
+#This root method calls the function, printkey and when I type something, it will print out what key that converts to
+#For instance, "up" refers to the up arrow on the keyboard, it's how I figured out how to use the up and down keys for the red bar
+#However, I commented out this method because it's useless now
 #root.bind("<Key>", printkey)
-#I need to call the canvas.after method so that it will run in the mainloop
+#I need to call the canvas.after method again so that it will run in the mainloop
 canvas.after(30, moveBall)
-#The mainloop is the method that runs the code over and over again and it won't stop until I have told it to stop
+#The mainloop is the method that runs the code over and over again and it won't stop until I force it to stop
 root.mainloop()
