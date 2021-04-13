@@ -1,6 +1,9 @@
 #The import of tkinter as tk is what allows me to create all the graphics for my game
 import tkinter as tk
 
+#When I mention the use of a 'method' I refer to a function that belongs to an object.
+#For example, canvas.move() is a function where the 'move' method belongs to the 'object' canvas
+#When I say function in python, that refers to a block of code that performs an assigned task that can be reused by the use of a function call
 root = tk.Tk()
 #This 'root.title' method displays the title of the game "Pong" on the top of the canvas
 root.title("Pong")
